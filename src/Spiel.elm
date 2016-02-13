@@ -43,7 +43,7 @@ packtl =
     schleg =
       [ Siebmer, Ochter, Neiner, Zehner, Unter, Ober, Kinig, Ass ]
   in
-    Wheli Schell
+    Wheli
       :: -- Konn mit List.apply <*> und List.map <$> realisiert werdn
          -- theoretisch: Kort <$> forbm <*> schleg
          (forbm

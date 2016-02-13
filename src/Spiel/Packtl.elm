@@ -46,5 +46,4 @@ labOber = lab Ober
 labKinig = lab Kinig
 labAss = lab Ass
 
-wheliMit forb = Wheli forb
-wheli = Wheli Schell
+wheli = Wheli

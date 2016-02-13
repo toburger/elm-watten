@@ -9,14 +9,14 @@ forb kort =
     Kort forb _ ->
       forb
 
-    Wheli forb ->
-      forb
+    Wheli ->
+      Schell
 
 
 checkKortn : KortnPaarl -> Result String KortnPaarl
 checkKortn ( kort1, kort2 ) =
   if kort1 == kort2 then
-    Result.Err "Die zwoa Kortn sein net gleich"
+    Result.Err "Die zwoa Kortn sein gleich"
   else
     Result.Ok ( kort1, kort2 )
 
@@ -32,11 +32,11 @@ heachererSchlog ( kort1, kort2 ) =
   in
     if forb1 == forb2 then
       case ( kort1, kort2 ) of
-        ( Wheli forb, kort2 ) ->
-          Result.Ok ( kort2, Wheli forb )
+        ( Wheli, kort2 ) ->
+          Result.Ok ( kort2, Wheli )
 
-        ( kort1, Wheli forb ) ->
-          Result.Ok ( kort1, Wheli forb )
+        ( kort1, Wheli ) ->
+          Result.Ok ( kort1, Wheli )
 
         ( Kort _ schlog1, Kort _ schlog2 ) ->
           case compareSchlog schlog1 schlog2 of
@@ -107,11 +107,11 @@ ischSchlogUansHeacher rechterSchlog kortnSchlog =
 ischGuater : Kort -> Kort -> Bool
 ischGuater rechter kort =
   case ( rechter, kort ) of
-    ( _, Wheli _ ) ->
+    ( _, Wheli ) ->
       -- Wheli konn nia der Guate sein
       False
 
-    ( Wheli _, _ ) ->
+    ( Wheli, _ ) ->
       -- Wenn der Wheli der Rechte isch, konns kuan Guatn gebm
       False
 
@@ -128,13 +128,13 @@ ischSchlog rechter kort =
       else
         rechterSchlog == schlog
 
-    ( Wheli _, Wheli _ ) ->
+    ( Wheli, Wheli ) ->
       True
 
-    ( _, Wheli _ ) ->
+    ( _, Wheli ) ->
       False
 
-    ( Wheli _, _ ) ->
+    ( Wheli, _ ) ->
       False
 
 
@@ -148,7 +148,7 @@ check f kort ( kort1, kort2 ) =
     ( kort1, kort2 )
 
 
-checkSchlog  : Kort -> KortnPaarl -> KortnPaarl
+checkSchlog : Kort -> KortnPaarl -> KortnPaarl
 checkSchlog =
   check ischSchlog
 
@@ -166,6 +166,6 @@ checkRechtn =
 stechn : Kort -> KortnPaarl -> Result String KortnPaarl
 stechn rechter =
   checkKortn
-  >> Result.map (heachererBlinder <| forb rechter)
-  >> (flip Result.andThen heachererSchlog)
-  >> Result.map (checkSchlog rechter >> checkRechtn rechter >> checkGuatn rechter)
+    >> Result.map (heachererBlinder <| forb rechter)
+    >> (flip Result.andThen heachererSchlog)
+    >> Result.map (checkSchlog rechter >> checkRechtn rechter >> checkGuatn rechter)

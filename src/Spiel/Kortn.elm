@@ -21,7 +21,7 @@ type Schlog
 
 type Kort
   = Kort Forb Schlog
-  | Wheli Forb
+  | Wheli
 
 
 type alias KortnPaarl =

@@ -84,7 +84,7 @@ kortnNome kort =
     Spiel.Kortn.Kort forb schlog ->
       toString forb ++ " " ++ toString schlog
 
-    Spiel.Kortn.Wheli _ ->
+    Spiel.Kortn.Wheli ->
       "Wheli"
 
 
