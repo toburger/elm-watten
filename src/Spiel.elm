@@ -74,8 +74,8 @@ type alias PacktlRest =
   Kortn
 
 
-gebm : Packtl -> Teams -> ( Teams, PacktlRest )
-gebm packtl teams =
+gebm : Teams -> Packtl -> ( Teams, PacktlRest )
+gebm teams packtl =
   let
     ( team1, team2 ) =
       teams
@@ -86,20 +86,17 @@ gebm packtl teams =
     ( spieler2, spieler4 ) =
       team2.spieler
 
-    gschmigltesPaarl =
-      mischgln packtl
-
     spieler1' =
       { spieler1
         | hond =
-            gschmigltesPaarl
+            packtl
               |> List.take 5
       }
 
     spieler2' =
       { spieler2
         | hond =
-            gschmigltesPaarl
+            packtl
               |> List.drop 5
               |> List.take 5
       }
@@ -107,7 +104,7 @@ gebm packtl teams =
     spieler3' =
       { spieler3
         | hond =
-            gschmigltesPaarl
+            packtl
               |> List.drop 10
               |> List.take 5
       }
@@ -115,13 +112,13 @@ gebm packtl teams =
     spieler4' =
       { spieler4
         | hond =
-            gschmigltesPaarl
+            packtl
               |> List.drop 15
               |> List.take 5
       }
 
     packtlRest =
-      gschmigltesPaarl
+      packtl
         |> List.drop 20
 
     team1' =

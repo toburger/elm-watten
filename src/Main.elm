@@ -3,13 +3,13 @@ module Main (..) where
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import StartApp.Simple
-import Spiel
-import Spiel.Kortn
+import Spiel exposing (..)
+import Spiel.Kortn exposing (..)
 
 
 spieler : Int -> String -> Spiel.Spieler
 spieler id nome =
-  Spiel.Spieler id nome []
+  Spieler id nome []
 
 
 spieler1 : Spiel.Spieler
@@ -56,12 +56,12 @@ teams =
 
 
 type alias Model =
-  ( Spiel.Teams, Spiel.Packtl )
+  ( Teams, Packtl )
 
 
 initialModel : Model
 initialModel =
-  ( teams, Spiel.packtl )
+  ( teams, packtl )
 
 
 type Action
@@ -72,25 +72,27 @@ update : Action -> Model -> Model
 update action model =
   case action of
     Mischgln ->
-      Spiel.gebm Spiel.packtl (fst model)
+      packtl
+        |> mischgln
+        |> gebm (fst model)
 
 
 kortnNome : Spiel.Kortn.Kort -> String
 kortnNome kort =
   case kort of
-    Spiel.Kortn.Kort forb schlog ->
+    Kort forb schlog ->
       toString forb ++ " " ++ toString schlog
 
-    Spiel.Kortn.Wheli ->
+    Wheli ->
       "Wheli"
 
 
-viewKort : Spiel.Kortn.Kort -> Html
+viewKort : Kort -> Html
 viewKort kort =
   li [] [ text (kortnNome kort) ]
 
 
-viewSpieler : Spiel.Spieler -> Html
+viewSpieler : Spieler -> Html
 viewSpieler spieler =
   div
     []
@@ -101,7 +103,7 @@ viewSpieler spieler =
     ]
 
 
-viewTeam : Spiel.Team -> Html
+viewTeam : Team -> Html
 viewTeam team =
   div
     []
