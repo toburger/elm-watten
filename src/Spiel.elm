@@ -1,8 +1,9 @@
 module Spiel (..) where
 
 import Spiel.Kortn exposing (..)
-import Spiel.Logik exposing (stechn)
+import Array
 import Random
+import Random.Array
 
 
 type alias Spieler =
@@ -57,11 +58,16 @@ packtl =
 
 mischgln : Packtl -> Packtl
 mischgln packtl =
-  packtl
-
-
-
---   Random.list 10 (Kort)
+  let
+    seed =
+      Random.initialSeed 1
+  in
+    packtl
+      |> Array.fromList
+      |> Random.Array.shuffle
+      |> (flip Random.generate seed)
+      |> fst
+      |> Array.toList
 
 
 type alias PacktlRest =

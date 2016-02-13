@@ -9,6 +9,7 @@ forb kort =
     Kort forb _ ->
       forb
 
+    -- Wheli isch is niedrigste Schell
     Wheli ->
       Schell
 
