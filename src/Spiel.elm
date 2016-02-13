@@ -39,7 +39,7 @@ packtl : Packtl
 packtl =
   let
     forbm =
-      [ Herz, Schell, Lab, Oachl ]
+      [ Schell, Oachl, Lab, Herz ]
 
     schleg =
       [ Siebmer, Ochter, Neiner, Zehner, Unter, Ober, Kinig, Ass ]

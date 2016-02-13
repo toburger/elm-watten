@@ -2,7 +2,7 @@ module Main (..) where
 
 import String
 import Html exposing (..)
-import Html.Attributes exposing (src, width, height, style)
+import Html.Attributes exposing (src, width, height, style, title)
 import Html.Events exposing (onClick)
 import StartApp.Simple
 import Spiel exposing (..)
@@ -67,15 +67,25 @@ initialModel =
 
 
 type Action
-  = Mischgln
+  = Nuistart
+  | Mischgln
+  | Gebm
 
 
 update : Action -> Model -> Model
 update action model =
   case action of
+    Nuistart ->
+      initialModel
+
     Mischgln ->
-      packtl
-        |> mischgln
+      ( fst model
+      , packtl
+          |> mischgln
+      )
+
+    Gebm ->
+      snd model
         |> gebm (fst model)
 
 
@@ -107,6 +117,7 @@ viewKort kort =
     [ img
         [ src (kortnNome kort)
         , height 100
+        , title (toString kort)
         ]
         []
     ]
@@ -136,15 +147,31 @@ viewTeam team =
     ]
 
 
+viewPacktl : Packtl -> Html
+viewPacktl packtl =
+  div
+    []
+    [ h1 [] [ text "Packtl" ]
+    , ul [] (List.map viewKort packtl)
+    ]
+
+
 view : Signal.Address Action -> Model -> Html
 view address ( ( team1, team2 ), packtl ) =
   div
     []
     [ button
+        [ onClick address Nuistart ]
+        [ text "nuistart" ]
+    , button
         [ onClick address Mischgln ]
         [ text "mischgln" ]
+    , button
+        [ onClick address Gebm ]
+        [ text "gebm" ]
     , viewTeam team1
     , viewTeam team2
+    , viewPacktl packtl
     ]
 
 
