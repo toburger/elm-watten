@@ -55,27 +55,24 @@ teams =
   ( team1, team2 )
 
 
-spiel : ( Spiel.Teams, Spiel.PacktlRest )
-spiel =
-  Spiel.gebm Spiel.packtl teams
-
-
 type alias Model =
-  Spiel.Teams
+  ( Spiel.Teams, Spiel.Packtl )
 
 
 initialModel : Model
 initialModel =
-  fst spiel
+  ( teams, Spiel.packtl )
 
 
-type alias Action =
-  ()
+type Action
+  = Mischgln
 
 
 update : Action -> Model -> Model
 update action model =
-  model
+  case action of
+    Mischgln ->
+      Spiel.gebm Spiel.packtl (fst model)
 
 
 kortnNome : Spiel.Kortn.Kort -> String
@@ -117,12 +114,15 @@ viewTeam team =
     ]
 
 
-view : Signal.Address a -> Model -> Html
-view address model =
+view : Signal.Address Action -> Model -> Html
+view address ( ( team1, team2 ), packtl ) =
   div
     []
-    [ viewTeam (fst model)
-    , viewTeam (snd model)
+    [ button
+        [ onClick address Mischgln ]
+        [ text "mischgln" ]
+    , viewTeam team1
+    , viewTeam team2
     ]
 
 
