@@ -23,18 +23,18 @@ spieler2 =
 
 spieler3 : Spiel.Spieler
 spieler3 =
-  spieler 3 "valerio"
+  spieler 3 "toni"
 
 
 spieler4 : Spiel.Spieler
 spieler4 =
-  spieler 4 "alessio"
+  spieler 4 "luis"
 
 
 team1 : Spiel.Team
 team1 =
   { id = 1
-  , name = "trouler"
+  , name = "team uans"
   , punktestond = 0
   , spieler = ( spieler1, spieler3 )
   }
@@ -43,7 +43,7 @@ team1 =
 team2 : Spiel.Team
 team2 =
   { id = 2
-  , name = "walsche"
+  , name = "team zwoa"
   , punktestond = 0
   , spieler = ( spieler2, spieler4 )
   }
