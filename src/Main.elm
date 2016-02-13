@@ -1,6 +1,8 @@
 module Main (..) where
 
+import String
 import Html exposing (..)
+import Html.Attributes exposing (src, width, height, style)
 import Html.Events exposing (onClick)
 import StartApp.Simple
 import Spiel exposing (..)
@@ -79,17 +81,35 @@ update action model =
 
 kortnNome : Spiel.Kortn.Kort -> String
 kortnNome kort =
-  case kort of
-    Kort forb schlog ->
-      toString forb ++ " " ++ toString schlog
+  let
+    path =
+      "/resources/images"
+  in
+    case kort of
+      Kort forb schlog ->
+        let
+          forb' =
+            toString forb |> String.toLower
 
-    Wheli ->
-      "Wheli"
+          schlog' =
+            toString schlog |> String.toLower
+        in
+          path ++ "/" ++ forb' ++ "/" ++ schlog' ++ ".png"
+
+      Wheli ->
+        path ++ "/wheli.png"
 
 
 viewKort : Kort -> Html
 viewKort kort =
-  li [] [ text (kortnNome kort) ]
+  li
+    []
+    [ img
+        [ src (kortnNome kort)
+        , height 100
+        ]
+        []
+    ]
 
 
 viewSpieler : Spieler -> Html
