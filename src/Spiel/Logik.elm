@@ -52,14 +52,14 @@ heachererSchlog ( kort1, kort2 ) =
       Result.Ok ( kort1, kort2 )
 
 
-ischForb : Forb -> Kort -> Bool
-ischForb forb' kort =
+ischBlinder : Forb -> Kort -> Bool
+ischBlinder forb' kort =
   forb kort == forb'
 
 
-heachereForb : Forb -> KortnPaarl -> KortnPaarl
-heachereForb forb ( kort1, kort2 ) =
-  case ( ischForb forb kort1, ischForb forb kort2 ) of
+heachererBlinder : Forb -> KortnPaarl -> KortnPaarl
+heachererBlinder forb ( kort1, kort2 ) =
+  case ( ischBlinder forb kort1, ischBlinder forb kort2 ) of
     ( True, False ) ->
       ( kort1, kort2 )
 
@@ -166,6 +166,6 @@ checkRechtn =
 stechn : Kort -> KortnPaarl -> Result String KortnPaarl
 stechn rechter =
   checkKortn
-  >> Result.map (heachereForb <| forb rechter)
+  >> Result.map (heachererBlinder <| forb rechter)
   >> (flip Result.andThen heachererSchlog)
   >> Result.map (checkSchlog rechter >> checkRechtn rechter >> checkGuatn rechter)
