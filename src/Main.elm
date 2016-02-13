@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Events exposing (onClick)
 import StartApp.Simple
 import Spiel
+import Spiel.Kortn
 
 
 spieler : Int -> String -> Spiel.Spieler
@@ -59,10 +60,76 @@ spiel =
   Spiel.gebm Spiel.packtl teams
 
 
+type alias Model =
+  Spiel.Teams
+
+
+initialModel : Model
+initialModel =
+  fst spiel
+
+
+type alias Action =
+  ()
+
+
+update : Action -> Model -> Model
+update action model =
+  model
+
+
+kortnNome : Spiel.Kortn.Kort -> String
+kortnNome kort =
+  case kort of
+    Spiel.Kortn.Kort forb schlog ->
+      toString forb ++ " " ++ toString schlog
+
+    Spiel.Kortn.Wheli _ ->
+      "Wheli"
+
+
+viewKort : Spiel.Kortn.Kort -> Html
+viewKort kort =
+  li [] [ text (kortnNome kort) ]
+
+
+viewSpieler : Spiel.Spieler -> Html
+viewSpieler spieler =
+  div
+    []
+    [ h2 [] [ text spieler.name ]
+    , ul
+        []
+        (List.map viewKort spieler.hond)
+    ]
+
+
+viewTeam : Spiel.Team -> Html
+viewTeam team =
+  div
+    []
+    [ h1 [] [ text team.name ]
+    , div
+        []
+        [ viewSpieler (fst team.spieler)
+        , viewSpieler (snd team.spieler)
+        ]
+    ]
+
+
+view : Signal.Address a -> Model -> Html
+view address model =
+  div
+    []
+    [ viewTeam (fst model)
+    , viewTeam (snd model)
+    ]
+
+
 main : Signal Html
 main =
   StartApp.Simple.start
-    { model = spiel
-    , update = \action model -> model
-    , view = \address model -> div [ onClick address () ] [ text (toString model) ]
+    { model = initialModel
+    , update = update
+    , view = view
     }
