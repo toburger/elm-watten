@@ -13323,7 +13323,7 @@
 	   $Task = Elm.Task.make(_elm);
 	   var _op = {};
 	   var kortnNome = function (kort) {
-	      var path = "/resources/images";
+	      var path = "resources/images";
 	      var _p0 = kort;
 	      if (_p0.ctor === "Kort") {
 	            var schlog$ = $String.toLower($Basics.toString(_p0._1));
