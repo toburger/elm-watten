@@ -88,7 +88,11 @@ update action model =
 
     Mischgln ->
       ( model
-      , Effects.tick (round >> Mischgler)
+      , Effects.tick
+          ((*) 1000.0
+            >> round
+            >> Mischgler
+          )
       )
 
     Mischgler seed ->
