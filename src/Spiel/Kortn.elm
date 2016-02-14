@@ -24,6 +24,10 @@ type Kort
   | Wheli
 
 
+type alias Kortn =
+  List Kort
+
+
 type alias KortnPaarl =
   ( Kort, Kort )
 

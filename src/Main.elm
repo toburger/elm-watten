@@ -1,40 +1,43 @@
 module Main (..) where
 
 import String
+import Effects
+import Task
 import Html exposing (..)
 import Html.Attributes exposing (src, width, height, style, title)
 import Html.Events exposing (onClick)
-import StartApp.Simple
-import Spiel exposing (..)
+import StartApp
+import Spiel.Spieler exposing (..)
 import Spiel.Kortn exposing (..)
+import Spiel.Packtl exposing (..)
 
 
-spieler : Int -> String -> Spiel.Spieler
+spieler : Int -> String -> Spieler
 spieler id nome =
   Spieler id nome []
 
 
-spieler1 : Spiel.Spieler
+spieler1 : Spieler
 spieler1 =
   spieler 1 "sepp"
 
 
-spieler2 : Spiel.Spieler
+spieler2 : Spieler
 spieler2 =
   spieler 1 "franz"
 
 
-spieler3 : Spiel.Spieler
+spieler3 : Spieler
 spieler3 =
   spieler 3 "toni"
 
 
-spieler4 : Spiel.Spieler
+spieler4 : Spieler
 spieler4 =
   spieler 4 "luis"
 
 
-team1 : Spiel.Team
+team1 : Team
 team1 =
   { id = 1
   , name = "team uans"
@@ -43,7 +46,7 @@ team1 =
   }
 
 
-team2 : Spiel.Team
+team2 : Team
 team2 =
   { id = 2
   , name = "team zwoa"
@@ -52,41 +55,60 @@ team2 =
   }
 
 
-teams : Spiel.Teams
+teams : Teams
 teams =
   ( team1, team2 )
 
 
 type alias Model =
-  ( Teams, Packtl )
+  { teams : Teams
+  , packtl : Packtl
+  }
 
 
 initialModel : Model
 initialModel =
-  ( teams, packtl )
+  { teams = teams
+  , packtl = packtl
+  }
 
 
 type Action
   = Nuistart
   | Mischgln
+  | Mischgler Int
   | Gebm
 
 
-update : Action -> Model -> Model
+update : Action -> Model -> ( Model, Effects.Effects Action )
 update action model =
-  case action of
+  case Debug.log "action" action of
     Nuistart ->
-      initialModel
+      ( initialModel, Effects.none )
 
     Mischgln ->
-      ( fst model
-      , packtl
-          |> mischgln
+      ( model
+      , Effects.tick (round >> Mischgler)
+      )
+
+    Mischgler seed ->
+      ( { model
+          | packtl =
+              model.packtl
+                |> mischgln seed
+        }
+      , Effects.none
       )
 
     Gebm ->
-      snd model
-        |> gebm (fst model)
+      let
+        ( teams, packtl ) =
+          model.packtl
+            |> gebm model.teams
+      in
+        ( { teams = teams, packtl = packtl }
+        , Effects.none
+        )
 
 
 kortnNome : Spiel.Kortn.Kort -> String
@@ -157,7 +179,7 @@ viewPacktl packtl =
 
 
 view : Signal.Address Action -> Model -> Html
-view address ( ( team1, team2 ), packtl ) =
+view address { teams, packtl } =
   div
     []
     [ button
@@ -169,16 +191,27 @@ view address ( ( team1, team2 ), packtl ) =
     , button
         [ onClick address Gebm ]
         [ text "gebm" ]
-    , viewTeam team1
-    , viewTeam team2
+    , viewTeam (fst teams)
+    , viewTeam (snd teams)
     , viewPacktl packtl
     ]
 
 
-main : Signal Html
-main =
-  StartApp.Simple.start
-    { model = initialModel
+app : StartApp.App Model
+app =
+  StartApp.start
+    { init = ( initialModel, Effects.none )
     , update = update
     , view = view
+    , inputs = []
     }
+
+
+main : Signal Html
+main =
+  app.html
+
+
+port tasks : Signal (Task.Task Effects.Never ())
+port tasks =
+  app.tasks
