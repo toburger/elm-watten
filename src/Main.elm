@@ -4,7 +4,7 @@ import String
 import Effects
 import Task
 import Html exposing (..)
-import Html.Attributes exposing (src, width, height, style, title)
+import Html.Attributes exposing (src, width, height, style, title, class)
 import Html.Events exposing (onClick)
 import StartApp
 import Spiel.Spieler exposing (..)
@@ -139,7 +139,7 @@ kortnNome kort =
 viewKort : Kort -> Html
 viewKort kort =
   li
-    []
+    [ class "inline-block mr1" ]
     [ img
         [ src (kortnNome kort)
         , height 100
@@ -153,9 +153,11 @@ viewSpieler : Spieler -> Html
 viewSpieler spieler =
   div
     []
-    [ h2 [] [ text spieler.name ]
+    [ h2
+        [ class "h2" ]
+        [ text spieler.name ]
     , ul
-        []
+        [ class "list-reset" ]
         (List.map viewKort spieler.hond)
     ]
 
@@ -163,8 +165,10 @@ viewSpieler spieler =
 viewTeam : Team -> Html
 viewTeam team =
   div
-    []
-    [ h1 [] [ text team.name ]
+    [ class "col-4" ]
+    [ h1
+        [ class "h1" ]
+        [ text team.name ]
     , div
         []
         [ viewSpieler (fst team.spieler)
@@ -177,8 +181,12 @@ viewPacktl : Packtl -> Html
 viewPacktl packtl =
   div
     []
-    [ h1 [] [ text "Packtl" ]
-    , ul [] (List.map viewKort packtl)
+    [ h1
+        [ class "h1" ]
+        [ text "Packtl" ]
+    , ul
+        [ class "list-reset" ]
+        (List.map viewKort packtl)
     ]
 
 
@@ -195,8 +203,11 @@ view address { teams, packtl } =
     , button
         [ onClick address Gebm ]
         [ text "gebm" ]
-    , viewTeam (fst teams)
-    , viewTeam (snd teams)
+    , div
+        [ class "flex justify-start" ]
+        [ viewTeam (fst teams)
+        , viewTeam (snd teams)
+        ]
     , viewPacktl packtl
     ]
 
