@@ -4,7 +4,7 @@ import String
 import Effects
 import Task
 import Html exposing (..)
-import Html.Attributes exposing (src, width, height, style, title, class)
+import Html.Attributes exposing (src, width, height, style, title, class, disabled)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (..)
 import StartApp
@@ -85,19 +85,20 @@ type alias Model =
   }
 
 
-initialModel : Model
+initialModel : ( Model, Effects.Effects Action )
 initialModel =
-  { teams = teams
-  , packtl = packtl
-  , tisch = []
-  , zug = Nothing
-  , runde = Nothing
-  }
+  ( { teams = teams
+    , packtl = packtl
+    , tisch = []
+    , zug = Nothing
+    , runde = Nothing
+    }
+  , Effects.tick ((*) 1000.0 >> round >> Mischgler)
+  )
 
 
 type Action
-  = Nuistart
-  | Mischgln
+  = Mischgln
   | Mischgler Int
   | Gebm
   | KortSpieln Spieler Kort
@@ -165,17 +166,8 @@ zugAlsNummer zug =
 update : Action -> Model -> ( Model, Effects.Effects Action )
 update action model =
   case Debug.log "action" action of
-    Nuistart ->
-      ( initialModel, Effects.none )
-
     Mischgln ->
-      ( model
-      , Effects.tick
-          ((*) 1000.0
-            >> round
-            >> Mischgler
-          )
-      )
+      initialModel
 
     Mischgler seed ->
       ( { model
@@ -265,7 +257,10 @@ viewSpieler address zug spieler =
     div
       ([]
         ++ if ok then
-            [ style [ ( "background-color", "lightsteelblue" ) ] ]
+            [ style
+                [ ( "background-color", "lightsteelblue" )
+                ]
+            ]
            else
             []
       )
@@ -277,7 +272,11 @@ viewSpieler address zug spieler =
           (List.map
             (lazy2
               (viewKort address)
-              (if ok then Just spieler else Nothing)
+              (if ok then
+                Just spieler
+               else
+                Nothing
+              )
             )
             spieler.hond
           )
@@ -347,16 +346,12 @@ view address { teams, packtl, tisch, zug, runde } =
     [ class "center" ]
     [ button
         [ class "btn"
-        , onClick address Nuistart
-        ]
-        [ text "nuistart" ]
-    , button
-        [ class "btn"
         , onClick address Mischgln
         ]
-        [ text "mischgln" ]
+        [ text "nui mischgln" ]
     , button
         [ class "btn"
+        , disabled (List.length packtl /= 33)
         , onClick address Gebm
         ]
         [ text "gebm" ]
@@ -384,7 +379,7 @@ view address { teams, packtl, tisch, zug, runde } =
 app : StartApp.App Model
 app =
   StartApp.start
-    { init = ( initialModel, Effects.none )
+    { init = initialModel
     , update = update
     , view = view
     , inputs = []
