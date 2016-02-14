@@ -6,6 +6,7 @@ import Task
 import Html exposing (..)
 import Html.Attributes exposing (src, width, height, style, title, class)
 import Html.Events exposing (onClick)
+import Html.Lazy exposing (..)
 import StartApp
 import Spiel.Spieler exposing (..)
 import Spiel.Kortn exposing (..)
@@ -204,7 +205,7 @@ viewSpieler address spieler =
         [ text spieler.name ]
     , ul
         [ class "list-reset" ]
-        (List.map (viewKort address (Just spieler)) spieler.hond)
+        (List.map (lazy2 (viewKort address) (Just spieler)) spieler.hond)
     ]
 
 
@@ -217,8 +218,8 @@ viewTeam address team =
         [ text team.name ]
     , div
         [ class "clearfix" ]
-        [ viewSpieler address (fst team.spieler)
-        , viewSpieler address (snd team.spieler)
+        [ lazy (viewSpieler address) (fst team.spieler)
+        , lazy (viewSpieler address) (snd team.spieler)
         ]
     ]
 
@@ -232,7 +233,7 @@ viewTisch address tisch =
         [ text "tisch"
         , ul
             []
-            (List.map (viewKort address Nothing) tisch)
+            (List.map (lazy (viewKort address Nothing)) tisch)
         ]
     ]
 
@@ -246,7 +247,7 @@ viewPacktl address packtl =
         [ text "packtl" ]
     , ul
         [ class "list-reset" ]
-        (List.map (viewKort address Nothing) packtl)
+        (List.map (lazy (viewKort address Nothing)) packtl)
     ]
 
 
@@ -265,11 +266,11 @@ view address { teams, packtl, tisch } =
         [ text "gebm" ]
     , div
         [ class "clearfix" ]
-        [ viewTeam address (fst teams)
-        , viewTeam address (snd teams)
-        , viewTisch address tisch
+        [ lazy (viewTeam address) (fst teams)
+        , lazy (viewTeam address) (snd teams)
+        , lazy (viewTisch address) tisch
         ]
-    , viewPacktl address packtl
+    , lazy (viewPacktl address) packtl
     ]
 
 
