@@ -25,7 +25,7 @@ spieler1 =
 
 spieler2 : Spieler
 spieler2 =
-  spieler 1 "franz"
+  spieler 2 "franz"
 
 
 spieler3 : Spieler
@@ -61,10 +61,27 @@ teams =
   ( team1, team2 )
 
 
+type Zug
+  = Spieler1
+  | Spieler2
+  | Spieler3
+  | Spieler4
+
+
+type Runde
+  = Runde1
+  | Runde2
+  | Runde3
+  | Runde4
+  | Runde5
+
+
 type alias Model =
   { teams : Teams
   , packtl : Packtl
   , tisch : Spiel
+  , zug : Maybe Zug
+  , runde : Maybe Runde
   }
 
 
@@ -73,6 +90,8 @@ initialModel =
   { teams = teams
   , packtl = packtl
   , tisch = []
+  , zug = Nothing
+  , runde = Nothing
   }
 
 
@@ -103,6 +122,44 @@ kortEntfernen kort ( team1, team2 ) =
       }
   in
     ( filterTeam team1, filterTeam team2 )
+
+
+zugWeiter : Maybe Zug -> Maybe Zug
+zugWeiter zug =
+  case zug of
+    Nothing ->
+      Just Spieler1
+
+    Just Spieler1 ->
+      Just Spieler2
+
+    Just Spieler2 ->
+      Just Spieler3
+
+    Just Spieler3 ->
+      Just Spieler4
+
+    Just Spieler4 ->
+      Nothing
+
+
+zugAlsNummer : Maybe Zug -> Int
+zugAlsNummer zug =
+  case zug of
+    Nothing ->
+      0
+
+    Just Spieler1 ->
+      1
+
+    Just Spieler2 ->
+      2
+
+    Just Spieler3 ->
+      3
+
+    Just Spieler4 ->
+      4
 
 
 update : Action -> Model -> ( Model, Effects.Effects Action )
@@ -138,6 +195,8 @@ update action model =
         ( { model
             | teams = teams
             , packtl = packtl
+            , zug = Just Spieler1
+            , runde = Just Runde1
           }
         , Effects.none
         )
@@ -146,6 +205,7 @@ update action model =
       ( { model
           | teams = kortEntfernen kort model.teams
           , tisch = kort :: model.tisch
+          , zug = zugWeiter model.zug
         }
       , Effects.none
       )
@@ -196,45 +256,70 @@ viewKort address spieler kort =
       ]
 
 
-viewSpieler : Signal.Address Action -> Spieler -> Html
-viewSpieler address spieler =
-  div
-    [ class "sm-col sm-col-6" ]
-    [ h2
-        [ class "h2" ]
-        [ text spieler.name ]
-    , ul
-        [ class "list-reset" ]
-        (List.map (lazy2 (viewKort address) (Just spieler)) spieler.hond)
-    ]
+viewSpieler : Signal.Address Action -> Maybe Zug -> Spieler -> Html
+viewSpieler address zug spieler =
+  let
+    ok =
+      zugAlsNummer zug == spieler.id
+  in
+    div
+      ([]
+        ++ if ok then
+            [ style [ ( "background-color", "lightsteelblue" ) ] ]
+           else
+            []
+      )
+      [ h2
+          [ class "h2" ]
+          [ text spieler.name ]
+      , ul
+          [ class "list-reset" ]
+          (List.map
+            (lazy2
+              (viewKort address)
+              (if ok then Just spieler else Nothing)
+            )
+            spieler.hond
+          )
+      ]
 
 
-viewTeam : Signal.Address Action -> Team -> Html
-viewTeam address team =
+viewTeam : Signal.Address Action -> Maybe Zug -> Team -> Html
+viewTeam address zug team =
   div
     [ class "sm-col sm-col-4" ]
     [ h1
         [ class "h1" ]
         [ text team.name ]
     , div
-        [ class "clearfix" ]
-        [ lazy (viewSpieler address) (fst team.spieler)
-        , lazy (viewSpieler address) (snd team.spieler)
+        []
+        [ lazy2
+            (viewSpieler address)
+            zug
+            (fst team.spieler)
+        , lazy2
+            (viewSpieler address)
+            zug
+            (snd team.spieler)
         ]
     ]
 
 
-viewTisch : Signal.Address Action -> Spiel -> Html
-viewTisch address tisch =
+viewTisch : Signal.Address Action -> Maybe Zug -> Spiel -> Html
+viewTisch address zug tisch =
   div
     [ class "sm-col sm-col-4" ]
     [ h1
         [ class "h1" ]
-        [ text "tisch"
-        , ul
-            []
-            (List.map (lazy (viewKort address Nothing)) tisch)
-        ]
+        [ text "tisch" ]
+    , ul
+        []
+        (List.map
+          (lazy
+            (viewKort address Nothing)
+          )
+          tisch
+        )
     ]
 
 
@@ -247,30 +332,52 @@ viewPacktl address packtl =
         [ text "packtl" ]
     , ul
         [ class "list-reset" ]
-        (List.map (lazy (viewKort address Nothing)) packtl)
+        (List.map
+          (lazy
+            (viewKort address Nothing)
+          )
+          packtl
+        )
     ]
 
 
 view : Signal.Address Action -> Model -> Html
-view address { teams, packtl, tisch } =
+view address { teams, packtl, tisch, zug, runde } =
   div
-    []
+    [ class "center" ]
     [ button
-        [ onClick address Nuistart ]
+        [ class "btn"
+        , onClick address Nuistart
+        ]
         [ text "nuistart" ]
     , button
-        [ onClick address Mischgln ]
+        [ class "btn"
+        , onClick address Mischgln
+        ]
         [ text "mischgln" ]
     , button
-        [ onClick address Gebm ]
+        [ class "btn"
+        , onClick address Gebm
+        ]
         [ text "gebm" ]
     , div
         [ class "clearfix" ]
-        [ lazy (viewTeam address) (fst teams)
-        , lazy (viewTeam address) (snd teams)
-        , lazy (viewTisch address) tisch
+        [ lazy2
+            (viewTeam address)
+            zug
+            (fst teams)
+        , lazy2
+            (viewTeam address)
+            zug
+            (snd teams)
+        , lazy2
+            (viewTisch address)
+            zug
+            tisch
         ]
-    , lazy (viewPacktl address) packtl
+    , lazy
+        (viewPacktl address)
+        packtl
     ]
 
 
