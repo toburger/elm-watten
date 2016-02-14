@@ -1,0 +1,33 @@
+{
+  "name": "elm-watten",
+  "version": "1.0.0",
+  "description": "Watten in elm: https://de.wikipedia.org/wiki/Watten",
+  "main": "elm.js",
+  "dependencies": {
+    "basscss": "^8.0.0",
+    "css-loader": "^0.23.1",
+    "elm-webpack-loader": "^2.0.0",
+    "file-loader": "^0.8.5",
+    "font-awesome": "^4.5.0",
+    "style-loader": "^0.13.0",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.12.13",
+    "webpack-dev-server": "^1.14.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "dev": "webpack-dev-server --port 8000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toburger/elm-watten.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/toburger/elm-watten/issues"
+  },
+  "homepage": "https://github.com/toburger/elm-watten#readme"
+}
