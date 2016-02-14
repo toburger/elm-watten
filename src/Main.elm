@@ -63,6 +63,7 @@ teams =
 type alias Model =
   { teams : Teams
   , packtl : Packtl
+  , tisch : Spiel
   }
 
 
@@ -70,6 +71,7 @@ initialModel : Model
 initialModel =
   { teams = teams
   , packtl = packtl
+  , tisch = []
   }
 
 
@@ -78,6 +80,7 @@ type Action
   | Mischgln
   | Mischgler Int
   | Gebm
+  | KortSpieln Spieler Kort
 
 
 update : Action -> Model -> ( Model, Effects.Effects Action )
@@ -110,9 +113,19 @@ update action model =
           model.packtl
             |> gebm model.teams
       in
-        ( { teams = teams, packtl = packtl }
+        ( { model
+            | teams = teams
+            , packtl = packtl
+          }
         , Effects.none
         )
+
+    KortSpieln player kort ->
+      ( { model
+          | tisch = kort :: model.tisch
+        }
+      , Effects.none
+      )
 
 
 kortnNome : Spiel.Kortn.Kort -> String
@@ -136,59 +149,74 @@ kortnNome kort =
         path ++ "/wheli.png"
 
 
-viewKort : Kort -> Html
-viewKort kort =
-  li
-    [ class "inline-block mr1" ]
-    [ img
-        [ src (kortnNome kort)
-        , height 100
-        , title (toString kort)
-        ]
-        []
-    ]
+viewKort : Signal.Address Action -> Maybe (Spieler) -> Kort -> Html
+viewKort address spieler kort =
+  let
+    attribs =
+      case spieler of
+        Just spieler ->
+          [ onClick address (KortSpieln spieler kort) ]
+
+        Nothing ->
+          []
+  in
+    li
+      [ class "inline-block mr1" ]
+      [ img
+          ([ src (kortnNome kort)
+           , height 100
+           , title (toString kort)
+           ]
+            ++ attribs
+          )
+          []
+      ]
 
 
-viewSpieler : Spieler -> Html
-viewSpieler spieler =
+viewSpieler : Signal.Address Action -> Spieler -> Html
+viewSpieler address spieler =
   div
-    []
+    [ class "sm-col sm-col-6" ]
     [ h2
         [ class "h2" ]
         [ text spieler.name ]
     , ul
         [ class "list-reset" ]
-        (List.map viewKort spieler.hond)
+        (List.map (viewKort address (Just spieler)) spieler.hond)
     ]
 
 
-viewTeam : Team -> Html
-viewTeam team =
+viewTeam : Signal.Address Action -> Team -> Html
+viewTeam address team =
   div
-    [ class "col-4" ]
+    [ class "sm-col sm-col-4" ]
     [ h1
         [ class "h1" ]
         [ text team.name ]
     , div
-        []
-        [ viewSpieler (fst team.spieler)
-        , viewSpieler (snd team.spieler)
+        [ class "clearfix" ]
+        [ viewSpieler address (fst team.spieler)
+        , viewSpieler address (snd team.spieler)
         ]
     ]
 
 
-viewTisch : Html
-viewTisch =
+viewTisch : Signal.Address Action -> Spiel -> Html
+viewTisch address tisch =
   div
-    []
+    [ class "sm-col sm-col-4" ]
     [ h1
         [ class "h1" ]
-        [ text "tisch" ]
+        [ text "tisch"
+        , ul
+            []
+            (List.map (viewKort address Nothing) tisch)
+        ]
     ]
 
 
-viewPacktl : Packtl -> Html
-viewPacktl packtl =
+viewPacktl : Signal.Address Action -> Packtl -> Html
+viewPacktl address packtl =
   div
     []
     [ h1
@@ -196,12 +224,12 @@ viewPacktl packtl =
         [ text "packtl" ]
     , ul
         [ class "list-reset" ]
-        (List.map viewKort packtl)
+        (List.map (viewKort address Nothing) packtl)
     ]
 
 
 view : Signal.Address Action -> Model -> Html
-view address { teams, packtl } =
+view address { teams, packtl, tisch } =
   div
     []
     [ button
@@ -214,12 +242,12 @@ view address { teams, packtl } =
         [ onClick address Gebm ]
         [ text "gebm" ]
     , div
-        [ class "flex justify-start" ]
-        [ viewTeam (fst teams)
-        , viewTeam (snd teams)
-        , viewTisch
+        [ class "clearfix" ]
+        [ viewTeam address (fst teams)
+        , viewTeam address (snd teams)
+        , viewTisch address tisch
         ]
-    , viewPacktl packtl
+    , viewPacktl address packtl
     ]
 
 

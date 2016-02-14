@@ -33,7 +33,7 @@ type alias KortnPaarl =
 
 
 type alias Spiel =
-  ( Kort, Kort, Kort, Kort )
+  List Kort
 
 
 type alias Hond =
