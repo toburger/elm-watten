@@ -83,6 +83,27 @@ type Action
   | KortSpieln Spieler Kort
 
 
+kortEntfernen : Kort -> Teams -> Teams
+kortEntfernen kort ( team1, team2 ) =
+  let
+    filterSpieler spieler =
+      { spieler
+        | hond =
+            spieler.hond
+              |> List.filter ((/=) kort)
+      }
+
+    filterTeam team =
+      { team
+        | spieler =
+            ( filterSpieler (fst team.spieler)
+            , filterSpieler (snd team.spieler)
+            )
+      }
+  in
+    ( filterTeam team1, filterTeam team2 )
+
+
 update : Action -> Model -> ( Model, Effects.Effects Action )
 update action model =
   case Debug.log "action" action of
@@ -122,7 +143,8 @@ update action model =
 
     KortSpieln player kort ->
       ( { model
-          | tisch = kort :: model.tisch
+          | teams = kortEntfernen kort model.teams
+          , tisch = kort :: model.tisch
         }
       , Effects.none
       )
