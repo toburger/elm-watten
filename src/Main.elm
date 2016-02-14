@@ -177,13 +177,23 @@ viewTeam team =
     ]
 
 
+viewTisch : Html
+viewTisch =
+  div
+    []
+    [ h1
+        [ class "h1" ]
+        [ text "tisch" ]
+    ]
+
+
 viewPacktl : Packtl -> Html
 viewPacktl packtl =
   div
     []
     [ h1
         [ class "h1" ]
-        [ text "Packtl" ]
+        [ text "packtl" ]
     , ul
         [ class "list-reset" ]
         (List.map viewKort packtl)
@@ -207,6 +217,7 @@ view address { teams, packtl } =
         [ class "flex justify-start" ]
         [ viewTeam (fst teams)
         , viewTeam (snd teams)
+        , viewTisch
         ]
     , viewPacktl packtl
     ]
